@@ -1,45 +1,49 @@
 package app;
 
+import app.utils.GraceHashJoin;
 import app.utils.JoinType;
-import app.utils.NestedLoopJoinUtil;
+import app.utils.RuntimeUtil;
 import com.opencsv.exceptions.CsvException;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class JoinApp {
-    private final File leftCSV;
-    private final File rightCSV;
+    private final Path leftCSV;
+    private final Path rightCSV;
     private final String columnName;
     private final JoinType joinType;
 
 
-    public JoinApp(File leftCSV, File rightCSV, String columnName, JoinType joinType) {
+    public JoinApp(Path leftCSV, Path rightCSV, String columnName, JoinType joinType) {
         this.leftCSV = leftCSV;
         this.rightCSV = rightCSV;
         this.columnName = columnName;
         this.joinType = joinType;
     }
 
-    public void executeJoin() {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        long totalMemory = Runtime.getRuntime().totalMemory();
-        long usedMemory = totalMemory - Runtime.getRuntime().freeMemory();
-        long totalFree = maxMemory - usedMemory;
+    public void executeJoin() throws IOException {
 
-        long csvSize = leftCSV.length() + rightCSV.length();
+        long totalFree = RuntimeUtil.getTotalFreeMemory();
 
-//        if (csvSize < 100_000_000 && csvSize < 0.1 * totalFree) {
-//            // use Nested Loop Join
-//        } else if (csvSize < totalFree * 0.9){
+        long csvSize = Files.size(leftCSV) + Files.size(rightCSV);
+
+//        if (csvSize < totalFree * 0.9){
 //            // use in-memory Hash Join
 //        } else {
 //            // use GRACE Hash Join
 //        }
 
-        NestedLoopJoinUtil nestedLoopJoinUtil = new NestedLoopJoinUtil(leftCSV, rightCSV, columnName, joinType);
+//        NestedLoopJoin nestedLoopJoin = new NestedLoopJoin(leftCSV, rightCSV, columnName, joinType);
+//        try {
+//            nestedLoopJoin.join();
+//        } catch (IOException | CsvException e) {
+//            e.printStackTrace();
+//        }
+        GraceHashJoin graceHashJoin = new GraceHashJoin(leftCSV, rightCSV, columnName, joinType);
         try {
-            nestedLoopJoinUtil.join();
+            graceHashJoin.join(true);
         } catch (IOException | CsvException e) {
             e.printStackTrace();
         }
@@ -62,20 +66,24 @@ public class JoinApp {
             }
         }
 
-        File leftCSV = new File(args[0]);
-        File rightCSV = new File(args[1]);
+        Path leftCSV = Path.of(args[0]);
+        Path rightCSV = Path.of(args[1]);
 
-        if (!leftCSV.exists() || leftCSV.isDirectory()) {
+        if (!Files.exists(leftCSV) || Files.isDirectory(leftCSV)) {
             System.out.println("File " + args[0] + " does not exist or is a directory");
             return;
         }
-        if (!rightCSV.exists() || rightCSV.isDirectory()) {
+        if (!Files.exists(rightCSV)|| Files.isDirectory(rightCSV)) {
             System.out.println("File " + args[1] + " does not exist or is a directory");
             return;
         }
 
         JoinApp joinApp = new JoinApp(leftCSV, rightCSV, args[2], joinType);
-        joinApp.executeJoin();
+        try {
+            joinApp.executeJoin();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static JoinType getJoinType(String join_type) {
