@@ -80,7 +80,7 @@ public class GraceHashJoin extends JoinUtil {
             long rowLength = Arrays.stream(firstRow).filter(Objects::nonNull).map(String::length).reduce(0, Integer::sum);
 
             long freeMemory = RuntimeUtil.getTotalFreeMemory();
-            long rowsToLoad = (freeMemory / 2) / rowLength;
+            long rowsToLoad = (freeMemory / 10) / rowLength;
 
             boolean reachedEnd = false;
             while (!reachedEnd) {
