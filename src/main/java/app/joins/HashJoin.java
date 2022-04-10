@@ -1,5 +1,7 @@
-package app.utils;
+package app.joins;
 
+import app.utils.CSVUtil;
+import app.utils.JoinType;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.opencsv.exceptions.CsvException;
@@ -17,23 +19,17 @@ public class HashJoin extends JoinUtil {
 
     @Override
     public void join(boolean printHeader) throws IOException, CsvException {
-        CSVUtil leftReader = new CSVUtil(leftCSV, false);
-        CSVUtil rightReader = new CSVUtil(rightCSV, false);
-
-        String[] leftHeader = leftReader.readRow();
-        String[] rightHeader = rightReader.readRow();
-
-        int leftIndex = getIndexOfColumn(leftHeader);
-        int rightIndex = getIndexOfColumn(rightHeader);
-
         if (printHeader) {
-            leftReader.printRowToStdout(combineHeaders(leftHeader, rightHeader, leftIndex, rightIndex));
+            printHeader();
         }
 
+        int leftIndex = getIndexOfJoinColumn(leftCSV, joinColumn);
+        int rightIndex = getIndexOfJoinColumn(rightCSV, joinColumn);
+
         Multimap<String, String[]> hashMap = createHashMap(leftCSV, leftIndex);
-        List<String[]> outputRows = new ArrayList<>(hashMap.size());
         CSVUtil csvUtil = new CSVUtil(rightCSV, false);
-        List<String[]> rightRows = csvUtil.readCSVFile();
+        LinkedList<String[]> rightRows = (LinkedList<String[]>) csvUtil.readCSVFile();
+        rightRows.removeFirst();
 
         for (String[] rightRow : rightRows) {
             Collection<String[]> matches = hashMap.get(rightRow[rightIndex]);
@@ -41,18 +37,22 @@ public class HashJoin extends JoinUtil {
             for (String[] leftRow : matches) {
                 String[] outputRow = getMatchedRows(leftRow, rightRow, leftIndex, rightIndex);
                 if (outputRow != null) {
-                    outputRows.add(outputRow);
+                    csvUtil.printRowToStdout(outputRow);
                 }
             }
         }
 
-        csvUtil.printCSVToStdout(outputRows);
         csvUtil.close();
     }
 
     private Multimap<String, String[]> createHashMap(Path file, int columnIndex) throws IOException, CsvException {
         try (CSVUtil reader = new CSVUtil(file, false)) {
-            List<String[]> rows = reader.readCSVFile();
+            LinkedList<String[]> rows = (LinkedList<String[]>) reader.readCSVFile();
+            rows.removeFirst();
+
+            if (rows.isEmpty()) {
+                return null;
+            }
 
             long rowLength = Arrays.stream(rows.get(0)).filter(Objects::nonNull).map(String::length).reduce(0, Integer::sum);
             long approxRows = Files.size(file) / rowLength;

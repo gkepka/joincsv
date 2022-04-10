@@ -74,9 +74,8 @@ public class CSVUtil implements AutoCloseable{
         stdoutWriter.flush();
     }
 
-    public void printRowToStdout(String[] row) throws IOException {
+    public void printRowToStdout(String[] row) {
         stdoutWriter.writeNext(row);
-        stdoutWriter.flush();
     }
 
     @Override
@@ -86,5 +85,6 @@ public class CSVUtil implements AutoCloseable{
         } else {
             reader.close();
         }
+        stdoutWriter.flush();
     }
 }

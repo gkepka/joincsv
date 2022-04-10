@@ -1,5 +1,7 @@
-package app.utils;
+package app.joins;
 
+import app.utils.CSVUtil;
+import app.utils.JoinType;
 import com.opencsv.exceptions.CsvException;
 
 import java.io.*;
@@ -23,8 +25,8 @@ public class NestedLoopJoin extends JoinUtil {
         String[] leftHeader = leftRows.remove(0);
         String[] rightHeader = rightRows.remove(0);
 
-        int leftIndex = getIndexOfColumn(leftHeader);
-        int rightIndex = getIndexOfColumn(rightHeader);
+        int leftIndex = getIndexOfJoinColumn(leftCSV, joinColumn);
+        int rightIndex = getIndexOfJoinColumn(rightCSV, joinColumn);
 
         List<String[]> outputRows = new ArrayList<>();
 

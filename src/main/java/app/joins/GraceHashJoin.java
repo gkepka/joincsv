@@ -1,7 +1,9 @@
-package app.utils;
+package app.joins;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+import app.utils.CSVUtil;
+import app.utils.HashFunction;
+import app.utils.JoinType;
+import app.utils.RuntimeUtil;
 import com.opencsv.exceptions.CsvException;
 
 import java.io.IOException;
@@ -11,24 +13,20 @@ import java.util.*;
 
 public class GraceHashJoin extends JoinUtil {
 
+    private final int FILES_COUNT = 128;
+
     public GraceHashJoin(Path leftCSV, Path rightCSV, String joinColumn, JoinType joinType) {
         super(leftCSV, rightCSV, joinColumn, joinType);
     }
 
     @Override
     public void join(boolean printHeader) throws IOException, CsvException {
-        CSVUtil leftReader = new CSVUtil(leftCSV, false);
-        CSVUtil rightReader = new CSVUtil(rightCSV, false);
-
-        String[] leftHeader = leftReader.readRow();
-        String[] rightHeader = rightReader.readRow();
-
-        int leftIndex = getIndexOfColumn(leftHeader);
-        int rightIndex = getIndexOfColumn(rightHeader);
-
         if (printHeader) {
-            leftReader.printRowToStdout(combineHeaders(leftHeader, rightHeader, leftIndex, rightIndex));
+            printHeader();
         }
+
+        int leftIndex = getIndexOfJoinColumn(leftCSV, joinColumn);
+        int rightIndex = getIndexOfJoinColumn(rightCSV, joinColumn);
 
         List<Path> leftPartitions = partitionFile(leftCSV, "L", leftIndex, String::hashCode);
         List<Path> rightPartitions = partitionFile(rightCSV, "R", rightIndex, String::hashCode);
@@ -46,10 +44,10 @@ public class GraceHashJoin extends JoinUtil {
     }
 
     public List<Path> partitionFile(Path path, String prefix, int columnIndex, HashFunction hashFunction) throws IOException, CsvException {
-        List<Path> tmpFiles = new ArrayList<>(129); // last one for rows having null on join column
-        List<CSVUtil> writers = new ArrayList<>(129);
+        List<Path> tmpFiles = new ArrayList<>(FILES_COUNT);
+        List<CSVUtil> writers = new ArrayList<>(FILES_COUNT);
         try {
-            for (int i = 0; i < 128; i++) {
+            for (int i = 0; i < FILES_COUNT; i++) {
                 tmpFiles.add(i, Files.createTempFile(prefix + i + "_", ".csv"));
                 tmpFiles.get(i).toFile().deleteOnExit();
                 writers.add(new CSVUtil(tmpFiles.get(i), true));
@@ -77,13 +75,9 @@ public class GraceHashJoin extends JoinUtil {
                 }
                 for (String[] row : rows) {
                     String columnValue = row[columnIndex];
-                    if (columnValue == null) {
-                        writers.get(writers.size() - 1).writeRow(row);
-                    } else {
-                        int hash = hashFunction.getHash(columnValue) % (writers.size() - 1);
-                        if (hash < 0) hash += (writers.size() - 1);
-                        writers.get(hash).writeRow(row);
-                    }
+                    int hash = hashFunction.getHash(columnValue) % FILES_COUNT;
+                    if (hash < 0) hash += FILES_COUNT;
+                    writers.get(hash).writeRow(row);
                 }
             }
         } finally {

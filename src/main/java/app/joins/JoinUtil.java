@@ -1,5 +1,7 @@
-package app.utils;
+package app.joins;
 
+import app.utils.CSVUtil;
+import app.utils.JoinType;
 import com.opencsv.exceptions.CsvException;
 
 import java.io.IOException;
@@ -20,7 +22,7 @@ public abstract class JoinUtil {
 
     public abstract void join(boolean printHeader) throws IOException, CsvException;
 
-    protected int getIndexOfColumn(String[] header) {
+    private int getIndexOfColumn(String[] header) {
         for (int i = 0; i < header.length; i++) {
             if (joinColumn.equals(header[i])) {
                 return i;
@@ -35,15 +37,35 @@ public abstract class JoinUtil {
             return combineRows(leftRow, rightRow, leftIndex, rightIndex, totalLength);
         } else {
             switch (joinType) {
-                case LEFT -> {
+                case LEFT:
                     return combineRows(leftRow, null, leftIndex, rightIndex, totalLength);
-                }
-                case RIGHT -> {
+                case RIGHT:
                     return combineRows(null, rightRow, leftIndex, rightIndex, totalLength);
-                }
-                default -> {return null;}
+                default:
+                    return null;
             }
         }
+    }
+
+    protected int getIndexOfJoinColumn(Path file, String joinColumn) throws IOException, CsvException {
+        try (CSVUtil csvUtil = new CSVUtil(file, false)){
+            String[] header = csvUtil.readRow();
+            return getIndexOfColumn(header);
+        }
+    }
+
+    protected void printHeader() throws IOException, CsvException {
+        try (CSVUtil leftReader = new CSVUtil(leftCSV, false);
+             CSVUtil rightReader = new CSVUtil(rightCSV, false))
+        {
+            String[] leftHeader = leftReader.readRow();
+            String[] rightHeader = rightReader.readRow();
+
+            int leftIndex = getIndexOfColumn(leftHeader);
+            int rightIndex = getIndexOfColumn(rightHeader);
+            leftReader.printRowToStdout(combineHeaders(leftHeader, rightHeader, leftIndex, rightIndex));
+        }
+
     }
 
     protected String[] combineHeaders(String[] leftHeader, String[] rightHeader, int leftIndex, int rightIndex) {
