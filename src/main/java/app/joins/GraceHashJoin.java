@@ -1,8 +1,6 @@
 package app.joins;
 
 import app.utils.CSVUtil;
-import app.utils.HashFunction;
-import app.utils.JoinType;
 import app.utils.RuntimeUtil;
 import com.opencsv.exceptions.CsvException;
 
@@ -25,8 +23,8 @@ public class GraceHashJoin extends JoinUtil {
             printHeader();
         }
 
-        int leftIndex = getIndexOfJoinColumn(leftCSV, joinColumn);
-        int rightIndex = getIndexOfJoinColumn(rightCSV, joinColumn);
+        int leftIndex = getIndexOfJoinColumn(leftCSV);
+        int rightIndex = getIndexOfJoinColumn(rightCSV);
 
         List<Path> leftPartitions = partitionFile(leftCSV, "L", leftIndex, String::hashCode);
         List<Path> rightPartitions = partitionFile(rightCSV, "R", rightIndex, String::hashCode);

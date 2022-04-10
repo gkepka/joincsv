@@ -1,7 +1,6 @@
 package app.utils;
 
 import com.opencsv.exceptions.CsvException;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayOutputStream;
@@ -44,9 +43,7 @@ class CSVUtilTest {
         List<String[]> rows = usernameReader.readCSVFile();
         assertArrayEquals(rows.get(0), new String[]{"username","id","name","surname"});
         assertArrayEquals(rows.get(5), new String[]{"smith79","5079","Jamie","Smith"});
-        assertThrows(IllegalStateException.class, () -> {
-            tmpWriter.readCSVFile();
-        });
+        assertThrows(IllegalStateException.class, () -> tmpWriter.readCSVFile());
     }
 
     @Test
@@ -56,9 +53,7 @@ class CSVUtilTest {
         assertArrayEquals(rows.get(0), new String[]{"username","id","name","surname"});
         assertArrayEquals(rows.get(1), new String[]{"booker12","9012","","Booker"});
 
-        assertThrows(IllegalStateException.class, () -> {
-            tmpWriter.readRows(2);
-        });
+        assertThrows(IllegalStateException.class, () -> tmpWriter.readRows(2));
     }
 
     @Test
@@ -68,9 +63,7 @@ class CSVUtilTest {
         row = usernameReader.readRow();
         assertArrayEquals(row, new String[]{"booker12","9012","","Booker"});
 
-        assertThrows(IllegalStateException.class, () -> {
-            tmpWriter.readRow();
-        });
+        assertThrows(IllegalStateException.class, () -> tmpWriter.readRow());
     }
 
     @Test
@@ -85,9 +78,7 @@ class CSVUtilTest {
 
         assertArrayEquals(row, readRow);
 
-        assertThrows(IllegalStateException.class, () -> {
-            usernameReader.writeRow(row);
-        });
+        assertThrows(IllegalStateException.class, () -> usernameReader.writeRow(row));
     }
 
     @Test

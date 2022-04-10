@@ -1,4 +1,4 @@
-package app.utils;
+package app.joins;
 
 @FunctionalInterface
 public interface HashFunction {

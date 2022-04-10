@@ -3,7 +3,7 @@ package app;
 import app.joins.GraceHashJoin;
 import app.joins.HashJoin;
 import app.joins.JoinUtil;
-import app.utils.JoinType;
+import app.joins.JoinType;
 import app.utils.RuntimeUtil;
 import com.opencsv.exceptions.CsvException;
 

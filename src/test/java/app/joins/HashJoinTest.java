@@ -1,6 +1,5 @@
 package app.joins;
 
-import app.utils.JoinType;
 import com.opencsv.exceptions.CsvException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

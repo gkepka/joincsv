@@ -1,7 +1,7 @@
 package app.joins;
 
 import app.utils.CSVUtil;
-import app.utils.JoinType;
+import app.utils.RowUtil;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.opencsv.exceptions.CsvException;
@@ -23,8 +23,8 @@ public class HashJoin extends JoinUtil {
             printHeader();
         }
 
-        int leftIndex = getIndexOfJoinColumn(leftCSV, joinColumn);
-        int rightIndex = getIndexOfJoinColumn(rightCSV, joinColumn);
+        int leftIndex = getIndexOfJoinColumn(leftCSV);
+        int rightIndex = getIndexOfJoinColumn(rightCSV);
 
         int totalLength = getRowLength(leftCSV) + getRowLength(rightCSV);
 
@@ -52,14 +52,14 @@ public class HashJoin extends JoinUtil {
             for (String[] leftRow : matches) {
                 if (leftRow[leftIndex].equals(rightRow[rightIndex])) {
                     rightMatched = true;
-                    csvUtil.printRowToStdout(combineRows(leftRow, rightRow, totalLength));
+                    csvUtil.printRowToStdout(RowUtil.combineRows(leftRow, rightRow, totalLength));
                 }
             }
             if (joinType != JoinType.INNER && !rightMatched) {
                 if (joinType == JoinType.RIGHT) {
-                    csvUtil.printRowToStdout(combineRows(null, rightRow, totalLength));
+                    csvUtil.printRowToStdout(RowUtil.combineRows(null, rightRow, totalLength));
                 } else if (joinType == JoinType.LEFT) {
-                    csvUtil.printRowToStdout(combineRows(rightRow, null, totalLength));
+                    csvUtil.printRowToStdout(RowUtil.combineRows(rightRow, null, totalLength));
                 }
             }
         }
@@ -71,6 +71,10 @@ public class HashJoin extends JoinUtil {
         try (CSVUtil reader = new CSVUtil(file, false)) {
             LinkedList<String[]> rows = (LinkedList<String[]>) reader.readCSVFile();
             rows.removeFirst();
+
+            if (rows.isEmpty()) {
+                return ArrayListMultimap.create();
+            }
 
             long rowLength = Arrays.stream(rows.get(0)).filter(Objects::nonNull).map(String::length).reduce(0, Integer::sum);
             long approxRows = Files.size(file) / rowLength;

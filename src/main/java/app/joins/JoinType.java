@@ -1,4 +1,4 @@
-package app.utils;
+package app.joins;
 
 public enum JoinType {
     INNER,
