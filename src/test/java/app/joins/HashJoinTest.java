@@ -35,13 +35,11 @@ class HashJoinTest {
         HashJoin innerJoin = new HashJoin(leftFile, rightFile, columnName, JoinType.INNER);
         innerJoin.join(true);
 
-        String innerJoinExpectedResult = """
-                "email","id","name","surname","username","id","name","surname"
-                "laura@example.com","2070","Laura","Grey","grey07","2070","Laura","Grey"
-                "craig@example.com","4081","Craig","Johnson","johnson81","4081","Craig","Johnson"
-                "mary@example.com","9346","Mary","Jenkins","jenkins46","9346","Mary","Jenkins"
-                "jamie@example.com","5079","Jamie","Smith","smith79","5079","Jamie","Smith"
-                """;
+        String innerJoinExpectedResult = "\"email\",\"id\",\"name\",\"surname\",\"username\",\"id\",\"name\",\"surname\"\n" +
+                                         "\"laura@example.com\",\"2070\",\"Laura\",\"Grey\",\"grey07\",\"2070\",\"Laura\",\"Grey\"\n" +
+                                         "\"craig@example.com\",\"4081\",\"Craig\",\"Johnson\",\"johnson81\",\"4081\",\"Craig\",\"Johnson\"\n" +
+                                         "\"mary@example.com\",\"9346\",\"Mary\",\"Jenkins\",\"jenkins46\",\"9346\",\"Mary\",\"Jenkins\"\n" +
+                                         "\"jamie@example.com\",\"5079\",\"Jamie\",\"Smith\",\"smith79\",\"5079\",\"Jamie\",\"Smith\"\n";
         assertEquals(innerJoinExpectedResult, outContent.toString());
     }
 
@@ -50,14 +48,12 @@ class HashJoinTest {
         HashJoin leftJoin = new HashJoin(leftFile, rightFile, columnName, JoinType.LEFT);
         leftJoin.join(true);
 
-        String leftJoinExpectedResult = """
-                "email","id","name","surname","username","id","name","surname"
-                "laura@example.com","2070","Laura","Grey","grey07","2070","Laura","Grey"
-                "craig@example.com","4081","Craig","Johnson","johnson81","4081","Craig","Johnson"
-                "mary@example.com","9346","Mary","Jenkins","jenkins46","9346","Mary","Jenkins"
-                "jamie@example.com","5079","Jamie","Smith","smith79","5079","Jamie","Smith"
-                "john@example.com","1111","John","Smith",,,,
-                """;
+        String leftJoinExpectedResult = "\"email\",\"id\",\"name\",\"surname\",\"username\",\"id\",\"name\",\"surname\"\n" +
+                                        "\"laura@example.com\",\"2070\",\"Laura\",\"Grey\",\"grey07\",\"2070\",\"Laura\",\"Grey\"\n" +
+                                        "\"craig@example.com\",\"4081\",\"Craig\",\"Johnson\",\"johnson81\",\"4081\",\"Craig\",\"Johnson\"\n" +
+                                        "\"mary@example.com\",\"9346\",\"Mary\",\"Jenkins\",\"jenkins46\",\"9346\",\"Mary\",\"Jenkins\"\n" +
+                                        "\"jamie@example.com\",\"5079\",\"Jamie\",\"Smith\",\"smith79\",\"5079\",\"Jamie\",\"Smith\"\n" +
+                                        "\"john@example.com\",\"1111\",\"John\",\"Smith\",,,,\n";
 
         assertEquals(leftJoinExpectedResult, outContent.toString());
     }
@@ -67,16 +63,14 @@ class HashJoinTest {
         HashJoin rightJoin = new HashJoin(leftFile, rightFile, columnName, JoinType.RIGHT);
         rightJoin.join(true);
 
-        String rightJoinExpectedResult = """
-                "email","id","name","surname","username","id","name","surname"
-                ,,,,"booker12","9012","","Booker"
-                "laura@example.com","2070","Laura","Grey","grey07","2070","Laura","Grey"
-                "craig@example.com","4081","Craig","Johnson","johnson81","4081","Craig","Johnson"
-                "mary@example.com","9346","Mary","Jenkins","jenkins46","9346","Mary","Jenkins"
-                "jamie@example.com","5079","Jamie","Smith","smith79","5079","Jamie","Smith"
-                ,,,,"anne78","2222","Anne","Grey"
-                ,,,,"tom12","","Tom","Booker"
-                """;
+        String rightJoinExpectedResult = "\"email\",\"id\",\"name\",\"surname\",\"username\",\"id\",\"name\",\"surname\"\n" +
+                                         ",,,,\"booker12\",\"9012\",\"\",\"Booker\"\n" +
+                                         "\"laura@example.com\",\"2070\",\"Laura\",\"Grey\",\"grey07\",\"2070\",\"Laura\",\"Grey\"\n" +
+                                         "\"craig@example.com\",\"4081\",\"Craig\",\"Johnson\",\"johnson81\",\"4081\",\"Craig\",\"Johnson\"\n" +
+                                         "\"mary@example.com\",\"9346\",\"Mary\",\"Jenkins\",\"jenkins46\",\"9346\",\"Mary\",\"Jenkins\"\n" +
+                                         "\"jamie@example.com\",\"5079\",\"Jamie\",\"Smith\",\"smith79\",\"5079\",\"Jamie\",\"Smith\"\n" +
+                                         ",,,,\"anne78\",\"2222\",\"Anne\",\"Grey\"\n" +
+                                         ",,,,\"tom12\",\"\",\"Tom\",\"Booker\"\n";
 
         assertEquals(rightJoinExpectedResult, outContent.toString());
     }

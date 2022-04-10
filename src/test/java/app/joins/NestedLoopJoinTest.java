@@ -35,13 +35,11 @@ class NestedLoopJoinTest {
         NestedLoopJoin innerJoin = new NestedLoopJoin(leftFile, rightFile, columnName, JoinType.INNER);
         innerJoin.join(true);
 
-        String innerJoinExpectedResult = """
-                "email","id","name","surname","username","id","name","surname"
-                "craig@example.com","4081","Craig","Johnson","johnson81","4081","Craig","Johnson"
-                "mary@example.com","9346","Mary","Jenkins","jenkins46","9346","Mary","Jenkins"
-                "jamie@example.com","5079","Jamie","Smith","smith79","5079","Jamie","Smith"
-                "laura@example.com","2070","Laura","Grey","grey07","2070","Laura","Grey"
-                """;
+        String innerJoinExpectedResult = "\"email\",\"id\",\"name\",\"surname\",\"username\",\"id\",\"name\",\"surname\"\n" +
+                                         "\"craig@example.com\",\"4081\",\"Craig\",\"Johnson\",\"johnson81\",\"4081\",\"Craig\",\"Johnson\"\n" +
+                                         "\"mary@example.com\",\"9346\",\"Mary\",\"Jenkins\",\"jenkins46\",\"9346\",\"Mary\",\"Jenkins\"\n" +
+                                         "\"jamie@example.com\",\"5079\",\"Jamie\",\"Smith\",\"smith79\",\"5079\",\"Jamie\",\"Smith\"\n" +
+                                         "\"laura@example.com\",\"2070\",\"Laura\",\"Grey\",\"grey07\",\"2070\",\"Laura\",\"Grey\"\n";
 
         assertEquals(innerJoinExpectedResult, outContent.toString());
     }
@@ -51,14 +49,12 @@ class NestedLoopJoinTest {
         NestedLoopJoin leftJoin = new NestedLoopJoin(leftFile, rightFile, columnName, JoinType.LEFT);
         leftJoin.join(true);
 
-        String leftJoinExpectedResult = """
-                "email","id","name","surname","username","id","name","surname"
-                "craig@example.com","4081","Craig","Johnson","johnson81","4081","Craig","Johnson"
-                "mary@example.com","9346","Mary","Jenkins","jenkins46","9346","Mary","Jenkins"
-                "jamie@example.com","5079","Jamie","Smith","smith79","5079","Jamie","Smith"
-                "john@example.com","1111","John","Smith",,,,
-                "laura@example.com","2070","Laura","Grey","grey07","2070","Laura","Grey"
-                """;
+        String leftJoinExpectedResult = "\"email\",\"id\",\"name\",\"surname\",\"username\",\"id\",\"name\",\"surname\"\n" +
+                                        "\"craig@example.com\",\"4081\",\"Craig\",\"Johnson\",\"johnson81\",\"4081\",\"Craig\",\"Johnson\"\n" +
+                                        "\"mary@example.com\",\"9346\",\"Mary\",\"Jenkins\",\"jenkins46\",\"9346\",\"Mary\",\"Jenkins\"\n" +
+                                        "\"jamie@example.com\",\"5079\",\"Jamie\",\"Smith\",\"smith79\",\"5079\",\"Jamie\",\"Smith\"\n" +
+                                        "\"john@example.com\",\"1111\",\"John\",\"Smith\",,,,\n" +
+                                        "\"laura@example.com\",\"2070\",\"Laura\",\"Grey\",\"grey07\",\"2070\",\"Laura\",\"Grey\"\n";
 
         assertEquals(leftJoinExpectedResult, outContent.toString());
     }
@@ -68,16 +64,14 @@ class NestedLoopJoinTest {
         NestedLoopJoin rightJoin = new NestedLoopJoin(leftFile, rightFile, columnName, JoinType.RIGHT);
         rightJoin.join(true);
 
-        String rightJoinExpectedResult = """
-                "email","id","name","surname","username","id","name","surname"
-                "laura@example.com","2070","Laura","Grey","grey07","2070","Laura","Grey"
-                "craig@example.com","4081","Craig","Johnson","johnson81","4081","Craig","Johnson"
-                "mary@example.com","9346","Mary","Jenkins","jenkins46","9346","Mary","Jenkins"
-                "jamie@example.com","5079","Jamie","Smith","smith79","5079","Jamie","Smith"
-                ,,,,"anne78","2222","Anne","Grey"
-                ,,,,"tom12","","Tom","Booker"
-                ,,,,"booker12","9012","","Booker"
-                """;
+        String rightJoinExpectedResult = "\"email\",\"id\",\"name\",\"surname\",\"username\",\"id\",\"name\",\"surname\"\n" +
+                                         "\"laura@example.com\",\"2070\",\"Laura\",\"Grey\",\"grey07\",\"2070\",\"Laura\",\"Grey\"\n" +
+                                         "\"craig@example.com\",\"4081\",\"Craig\",\"Johnson\",\"johnson81\",\"4081\",\"Craig\",\"Johnson\"\n" +
+                                         "\"mary@example.com\",\"9346\",\"Mary\",\"Jenkins\",\"jenkins46\",\"9346\",\"Mary\",\"Jenkins\"\n" +
+                                         "\"jamie@example.com\",\"5079\",\"Jamie\",\"Smith\",\"smith79\",\"5079\",\"Jamie\",\"Smith\"\n" +
+                                         ",,,,\"anne78\",\"2222\",\"Anne\",\"Grey\"\n" +
+                                         ",,,,\"tom12\",\"\",\"Tom\",\"Booker\"\n" +
+                                         ",,,,\"booker12\",\"9012\",\"\",\"Booker\"\n";
 
         assertEquals(rightJoinExpectedResult, outContent.toString());
     }
