@@ -24,8 +24,9 @@ public abstract class JoinUtil {
     public abstract void join(boolean printHeader) throws IOException, CsvException;
 
     protected int getRowLength(Path path) throws IOException, CsvException {
-        CSVUtil csvUtil = new CSVUtil(path, false);
-        return csvUtil.readRow().length;
+        try (CSVUtil csvUtil = new CSVUtil(path, false)) {
+            return csvUtil.readRow().length;
+        }
     }
 
     protected int getIndexOfJoinColumn(Path file) throws IOException, CsvException {

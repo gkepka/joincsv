@@ -53,11 +53,11 @@ class GraceHashJoinTest {
 
         String leftJoinExpectedResult = """
                 "email","id","name","surname","username","id","name","surname"
-                "grey07","2070","Laura","Grey","laura@example.com","2070","Laura","Grey"
-                "jenkins46","9346","Mary","Jenkins","mary@example.com","9346","Mary","Jenkins"
-                "smith79","5079","Jamie","Smith","jamie@example.com","5079","Jamie","Smith"
+                "laura@example.com","2070","Laura","Grey","grey07","2070","Laura","Grey"
+                "mary@example.com","9346","Mary","Jenkins","jenkins46","9346","Mary","Jenkins"
+                "jamie@example.com","5079","Jamie","Smith","smith79","5079","Jamie","Smith"
                 "john@example.com","1111","John","Smith",,,,
-                "johnson81","4081","Craig","Johnson","craig@example.com","4081","Craig","Johnson"
+                "craig@example.com","4081","Craig","Johnson","johnson81","4081","Craig","Johnson"
                 """;
 
         assertEquals(leftJoinExpectedResult, outContent.toString());
