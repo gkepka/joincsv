@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CSVUtil implements AutoCloseable{
+public class CSVUtil implements AutoCloseable  {
     private final boolean write;
     private final CSVReader reader;
     private final CSVWriter writer;
@@ -55,13 +55,6 @@ public class CSVUtil implements AutoCloseable{
         return readRows(1).get(0);
     }
 
-    public void writeRows(List<String[]> rows) {
-        if (!write) {
-            throw new IllegalStateException("Object set for reading from file");
-        }
-        writer.writeAll(rows);
-    }
-
     public void writeRow(String[] row) {
         if (!write) {
             throw new IllegalStateException("Object set for reading from file");
@@ -69,13 +62,13 @@ public class CSVUtil implements AutoCloseable{
         writer.writeNext(row);
     }
 
-    public void printCSVToStdout(List<String[]> rows) throws IOException {
-        stdoutWriter.writeAll(rows);
-        stdoutWriter.flush();
-    }
-
     public void printRowToStdout(String[] row) {
         stdoutWriter.writeNext(row);
+    }
+
+    public void flush() throws IOException {
+        writer.flush();
+        stdoutWriter.flush();
     }
 
     @Override

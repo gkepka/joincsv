@@ -65,7 +65,6 @@ public abstract class JoinUtil {
             int rightIndex = getIndexOfColumn(rightHeader);
             leftReader.printRowToStdout(combineHeaders(leftHeader, rightHeader, leftIndex, rightIndex));
         }
-
     }
 
     protected String[] combineHeaders(String[] leftHeader, String[] rightHeader, int leftIndex, int rightIndex) {
@@ -117,7 +116,6 @@ public abstract class JoinUtil {
                 }
             }
         }
-
         return row;
     }
 }

@@ -2,6 +2,7 @@ package app;
 
 import app.joins.GraceHashJoin;
 import app.joins.HashJoin;
+import app.joins.JoinUtil;
 import app.utils.JoinType;
 import app.utils.RuntimeUtil;
 import com.opencsv.exceptions.CsvException;
@@ -28,13 +29,15 @@ public class JoinApp {
         long totalFree = RuntimeUtil.getTotalFreeMemory();
         long csvSize = Files.size(leftCSV) + Files.size(rightCSV);
 
+        JoinUtil joinUtil;
+
         if (csvSize < totalFree * 0.9){
-            HashJoin hashJoin = new HashJoin(leftCSV, rightCSV, columnName, joinType);
-            hashJoin.join(true);
+            joinUtil = new HashJoin(leftCSV, rightCSV, columnName, joinType);
         } else {
-            GraceHashJoin graceHashJoin = new GraceHashJoin(leftCSV, rightCSV, columnName, joinType);
-            graceHashJoin.join(true);
+            joinUtil = new GraceHashJoin(leftCSV, rightCSV, columnName, joinType);
         }
+
+        joinUtil.join(true);
     }
 
     public static void main(String[] args) {
@@ -76,7 +79,7 @@ public class JoinApp {
 
     private static JoinType getJoinType(String join_type) {
          switch (join_type) {
-            case "join":
+            case "inner":
                 return JoinType.INNER;
              case "left":
                  return JoinType.LEFT;
