@@ -1,6 +1,7 @@
 package app;
 
 import app.utils.GraceHashJoin;
+import app.utils.HashJoin;
 import app.utils.JoinType;
 import app.utils.RuntimeUtil;
 import com.opencsv.exceptions.CsvException;
@@ -23,29 +24,18 @@ public class JoinApp {
         this.joinType = joinType;
     }
 
-    public void executeJoin() throws IOException {
-
+    public void executeJoin() throws IOException, CsvException {
         long totalFree = RuntimeUtil.getTotalFreeMemory();
-
         long csvSize = Files.size(leftCSV) + Files.size(rightCSV);
+        System.out.println(csvSize);
+        System.out.println(totalFree);
 
-//        if (csvSize < totalFree * 0.9){
-//            // use in-memory Hash Join
-//        } else {
-//            // use GRACE Hash Join
-//        }
-
-//        NestedLoopJoin nestedLoopJoin = new NestedLoopJoin(leftCSV, rightCSV, columnName, joinType);
-//        try {
-//            nestedLoopJoin.join();
-//        } catch (IOException | CsvException e) {
-//            e.printStackTrace();
-//        }
-        GraceHashJoin graceHashJoin = new GraceHashJoin(leftCSV, rightCSV, columnName, joinType);
-        try {
+        if (csvSize < totalFree * 0.9){
+            HashJoin hashJoin = new HashJoin(leftCSV, rightCSV, columnName, joinType);
+            hashJoin.join(true);
+        } else {
+            GraceHashJoin graceHashJoin = new GraceHashJoin(leftCSV, rightCSV, columnName, joinType);
             graceHashJoin.join(true);
-        } catch (IOException | CsvException e) {
-            e.printStackTrace();
         }
     }
 
@@ -81,7 +71,7 @@ public class JoinApp {
         JoinApp joinApp = new JoinApp(leftCSV, rightCSV, args[2], joinType);
         try {
             joinApp.executeJoin();
-        } catch (IOException e) {
+        } catch (IOException | CsvException e) {
             e.printStackTrace();
         }
     }

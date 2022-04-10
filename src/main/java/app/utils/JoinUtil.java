@@ -29,6 +29,23 @@ public abstract class JoinUtil {
         throw new IllegalArgumentException("Header does not contain specified column name");
     }
 
+    protected String[] getMatchedRows(String[] leftRow, String[] rightRow, int leftIndex, int rightIndex) {
+        int totalLength = leftRow.length + rightRow.length - 1;
+        if (leftRow[leftIndex].equals(rightRow[rightIndex])) {
+            return combineRows(leftRow, rightRow, leftIndex, rightIndex, totalLength);
+        } else {
+            switch (joinType) {
+                case LEFT -> {
+                    return combineRows(leftRow, null, leftIndex, rightIndex, totalLength);
+                }
+                case RIGHT -> {
+                    return combineRows(null, rightRow, leftIndex, rightIndex, totalLength);
+                }
+                default -> {return null;}
+            }
+        }
+    }
+
     protected String[] combineHeaders(String[] leftHeader, String[] rightHeader, int leftIndex, int rightIndex) {
         String[] header = new String[leftHeader.length + rightHeader.length - 1];
         int index = 0;

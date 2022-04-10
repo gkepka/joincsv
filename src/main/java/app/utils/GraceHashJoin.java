@@ -1,5 +1,7 @@
 package app.utils;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.opencsv.exceptions.CsvException;
 
 import java.io.IOException;
@@ -34,13 +36,14 @@ public class GraceHashJoin extends JoinUtil {
         for (int i = 0; i < leftPartitions.size(); i++) {
             Path leftFile = leftPartitions.get(i);
             Path rightFile = rightPartitions.get(i);
-            NestedLoopJoin nestedLoopJoin = new NestedLoopJoin(leftFile, rightFile, joinColumn, joinType);
-            nestedLoopJoin.join(false);
+
+            HashJoin hashJoin = new HashJoin(leftFile, rightFile, joinColumn, joinType);
+            hashJoin.join(false);
+
             Files.delete(leftFile);
             Files.delete(rightFile);
         }
     }
-
 
     public List<Path> partitionFile(Path path, String prefix, int columnIndex, HashFunction hashFunction) throws IOException, CsvException {
         List<Path> tmpFiles = new ArrayList<>(129); // last one for rows having null on join column
@@ -70,6 +73,7 @@ public class GraceHashJoin extends JoinUtil {
                 List<String[]> rows = reader.readRows((int) rowsToLoad);
                 if (rows.size() < rowsToLoad) {
                     reachedEnd = true;
+                    rows.add(firstRow);
                 }
                 for (String[] row : rows) {
                     String columnValue = row[columnIndex];

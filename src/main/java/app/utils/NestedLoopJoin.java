@@ -29,7 +29,6 @@ public class NestedLoopJoin extends JoinUtil {
         List<String[]> outputRows = new ArrayList<>();
 
         String[] combinedHeader = combineHeaders(leftHeader, rightHeader, leftIndex, rightIndex);
-        int totalLength =combinedHeader.length;
 
         if (printHeader) {
             outputRows.add(combinedHeader);
@@ -37,13 +36,9 @@ public class NestedLoopJoin extends JoinUtil {
 
         for (String[] leftRow : leftRows) {
             for (String[] rightRow : rightRows) {
-                if (leftRow[leftIndex].equals(rightRow[rightIndex])) {
-                    outputRows.add(combineRows(leftRow, rightRow, leftIndex, rightIndex, totalLength));
-                } else {
-                    switch (joinType) {
-                        case LEFT -> outputRows.add(combineRows(leftRow, null, leftIndex, rightIndex, totalLength));
-                        case RIGHT -> outputRows.add(combineRows(null, rightRow, leftIndex, rightIndex, totalLength));
-                    }
+                String[] outputRow = getMatchedRows(leftRow, rightRow, leftIndex, rightIndex);
+                if (outputRow != null) {
+                    outputRows.add(outputRow);
                 }
             }
         }
