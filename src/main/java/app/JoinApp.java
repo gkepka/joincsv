@@ -31,7 +31,7 @@ public class JoinApp {
 
         JoinUtil joinUtil;
 
-        if (csvSize < totalFree * 0.9){
+        if (csvSize < totalFree * 0.8){
             joinUtil = new HashJoin(leftCSV, rightCSV, columnName, joinType);
         } else {
             joinUtil = new GraceHashJoin(leftCSV, rightCSV, columnName, joinType);
