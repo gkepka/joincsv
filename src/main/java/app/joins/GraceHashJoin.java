@@ -43,7 +43,7 @@ public class GraceHashJoin extends JoinUtil {
         }
     }
 
-    public List<Path> partitionFile(Path path, String prefix, int columnIndex, HashFunction hashFunction) throws IOException, CsvException {
+    private List<Path> partitionFile(Path path, String prefix, int columnIndex, HashFunction hashFunction) throws IOException, CsvException {
         List<Path> tmpFiles = new ArrayList<>(FILES_COUNT);
         List<CSVUtil> writers = new ArrayList<>(FILES_COUNT);
         try {

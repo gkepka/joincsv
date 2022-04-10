@@ -26,18 +26,40 @@ public class HashJoin extends JoinUtil {
         int leftIndex = getIndexOfJoinColumn(leftCSV, joinColumn);
         int rightIndex = getIndexOfJoinColumn(rightCSV, joinColumn);
 
-        Multimap<String, String[]> hashMap = createHashMap(leftCSV, leftIndex);
-        CSVUtil csvUtil = new CSVUtil(rightCSV, false);
-        LinkedList<String[]> rightRows = (LinkedList<String[]>) csvUtil.readCSVFile();
+        int totalLength = getRowLength(leftCSV) + getRowLength(rightCSV);
+
+        Multimap<String, String[]> hashMap;
+        CSVUtil csvUtil;
+        LinkedList<String[]> rightRows;
+
+        if (joinType == JoinType.RIGHT || joinType == JoinType.INNER) {
+            hashMap = createHashMap(leftCSV, leftIndex);
+            csvUtil = new CSVUtil(rightCSV, false);
+            rightRows = (LinkedList<String[]>) csvUtil.readCSVFile();
+        } else { // invert files position
+            int tmp = leftIndex;
+            leftIndex = rightIndex;
+            rightIndex = tmp;
+            hashMap = createHashMap(rightCSV, rightIndex);
+            csvUtil = new CSVUtil(leftCSV, false);
+            rightRows = (LinkedList<String[]>) csvUtil.readCSVFile();
+        }
         rightRows.removeFirst();
 
         for (String[] rightRow : rightRows) {
+            boolean rightMatched = false;
             Collection<String[]> matches = hashMap.get(rightRow[rightIndex]);
-            if (matches.isEmpty()) continue;
             for (String[] leftRow : matches) {
-                String[] outputRow = getMatchedRows(leftRow, rightRow, leftIndex, rightIndex);
-                if (outputRow != null) {
-                    csvUtil.printRowToStdout(outputRow);
+                if (leftRow[leftIndex].equals(rightRow[rightIndex])) {
+                    rightMatched = true;
+                    csvUtil.printRowToStdout(combineRows(leftRow, rightRow, totalLength));
+                }
+            }
+            if (joinType != JoinType.INNER && !rightMatched) {
+                if (joinType == JoinType.RIGHT) {
+                    csvUtil.printRowToStdout(combineRows(null, rightRow, totalLength));
+                } else if (joinType == JoinType.LEFT) {
+                    csvUtil.printRowToStdout(combineRows(rightRow, null, totalLength));
                 }
             }
         }
@@ -49,10 +71,6 @@ public class HashJoin extends JoinUtil {
         try (CSVUtil reader = new CSVUtil(file, false)) {
             LinkedList<String[]> rows = (LinkedList<String[]>) reader.readCSVFile();
             rows.removeFirst();
-
-            if (rows.isEmpty()) {
-                return null;
-            }
 
             long rowLength = Arrays.stream(rows.get(0)).filter(Objects::nonNull).map(String::length).reduce(0, Integer::sum);
             long approxRows = Files.size(file) / rowLength;

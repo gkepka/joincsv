@@ -31,20 +31,9 @@ public abstract class JoinUtil {
         throw new IllegalArgumentException("Header does not contain specified column name");
     }
 
-    protected String[] getMatchedRows(String[] leftRow, String[] rightRow, int leftIndex, int rightIndex) {
-        int totalLength = leftRow.length + rightRow.length - 1;
-        if (leftRow[leftIndex].equals(rightRow[rightIndex])) {
-            return combineRows(leftRow, rightRow, leftIndex, rightIndex, totalLength);
-        } else {
-            switch (joinType) {
-                case LEFT:
-                    return combineRows(leftRow, null, leftIndex, rightIndex, totalLength);
-                case RIGHT:
-                    return combineRows(null, rightRow, leftIndex, rightIndex, totalLength);
-                default:
-                    return null;
-            }
-        }
+    protected int getRowLength(Path path) throws IOException, CsvException {
+        CSVUtil csvUtil = new CSVUtil(path, false);
+        return csvUtil.readRow().length;
     }
 
     protected int getIndexOfJoinColumn(Path file, String joinColumn) throws IOException, CsvException {
@@ -61,61 +50,35 @@ public abstract class JoinUtil {
             String[] leftHeader = leftReader.readRow();
             String[] rightHeader = rightReader.readRow();
 
-            int leftIndex = getIndexOfColumn(leftHeader);
-            int rightIndex = getIndexOfColumn(rightHeader);
-            leftReader.printRowToStdout(combineHeaders(leftHeader, rightHeader, leftIndex, rightIndex));
+            leftReader.printRowToStdout(combineRows(leftHeader, rightHeader, leftHeader.length + rightHeader.length));
         }
     }
 
-    protected String[] combineHeaders(String[] leftHeader, String[] rightHeader, int leftIndex, int rightIndex) {
-        String[] header = new String[leftHeader.length + rightHeader.length - 1];
-        int index = 0;
-        for (int i = 0; i < leftHeader.length; i++) {
-            if (i != leftIndex) {
-                header[index++] = leftHeader[i];
-            }
-        }
-        header[index++] = joinColumn;
-        for (int i = 0; i < rightHeader.length; i++) {
-            if (i != rightIndex) {
-                header[index++] = rightHeader[i];
-            }
-        }
-        return header;
-    }
-
-    protected String[] combineRows(String[] leftRow, String[] rightRow, int leftIndex, int rightIndex, int totalLength) {
+    protected String[] combineRows(String[] leftRow, String[] rightRow, int totalLength) {
         if (leftRow == null && rightRow == null) {
             throw new IllegalArgumentException("Both rows cannot be null");
         }
-        String[] row = new String[totalLength];
+
+        String[] output = new String[totalLength];
         int index = 0;
 
         if (leftRow == null) {
-            for (int i = 0; i < totalLength - rightRow.length; i++) {
-                row[index++] = null;
+            index = totalLength - rightRow.length;
+            for (String value : rightRow) {
+                output[index++] = value;
             }
+        } else if (rightRow == null) {
+          for (String value : leftRow) {
+              output[index++] = value;
+          }
         } else {
-            for (int i = 0; i < leftRow.length; i++) {
-                if (i != leftIndex) {
-                    row[index++] = leftRow[i];
-                }
+            for (String value : leftRow) {
+                output[index++] = value;
+            }
+            for (String value : rightRow) {
+                output[index++] = value;
             }
         }
-
-        row[index++] = leftRow == null ? rightRow[rightIndex] : leftRow[leftIndex];
-
-        if (rightRow == null) {
-            for (int i = 0; i < totalLength - leftRow.length; i++) {
-                row[index++] = null;
-            }
-        } else {
-            for (int i = 0; i < rightRow.length; i++) {
-                if (i != rightIndex) {
-                    row[index++] = rightRow[i];
-                }
-            }
-        }
-        return row;
+        return output;
     }
 }
